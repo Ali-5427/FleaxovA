@@ -33,11 +33,11 @@ const Home = () => {
                         </main>
                     </div>
                 </div>
-                <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 flex items-center justify-center p-4">
+                <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 flex items-center justify-center">
                     <img
                         src="/hero-image.png"
                         alt="Student Freelancing Workspace"
-                        className="w-full h-auto max-h-[500px] object-contain rounded-2xl shadow-2xl"
+                        className="w-full h-auto max-h-[600px] object-contain"
                     />
                 </div>
             </div>
