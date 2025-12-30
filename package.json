@@ -1,0 +1,16 @@
+{
+    "name": "fleaxova-platform",
+    "version": "1.0.0",
+    "description": "FleaxovA - Payment-only Freelancing Platform for Students",
+    "scripts": {
+        "server": "cd server && npm run dev",
+        "client": "cd client && npm run dev",
+        "install-all": "cd server && npm install && cd ../client && npm install",
+        "dev": "concurrently \"npm run server\" \"npm run client\""
+    },
+    "dependencies": {
+        "concurrently": "^8.2.0"
+    },
+    "author": "FleaxovA Team",
+    "license": "ISC"
+}
