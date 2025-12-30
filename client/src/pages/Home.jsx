@@ -33,11 +33,12 @@ const Home = () => {
                         </main>
                     </div>
                 </div>
-                <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 bg-gray-50 flex items-center justify-center">
-                    {/* Using a placeholder SVG or nice gradient for "Corporate" feel */}
-                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400">
-                        <Zap className="h-48 w-48 opacity-10" />
-                    </div>
+                <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 flex items-center justify-center p-4">
+                    <img
+                        src="/hero-image.png"
+                        alt="Student Freelancing Workspace"
+                        className="w-full h-auto max-h-[500px] object-contain rounded-2xl shadow-2xl"
+                    />
                 </div>
             </div>
 
