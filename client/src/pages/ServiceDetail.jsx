@@ -4,6 +4,19 @@ import axios from 'axios';
 import { Check, Shield, Clock, DollarSign, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+const getCategoryImage = (category) => {
+    const images = {
+        'Development': 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+        'Design': 'https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1200&q=80',
+        'Writing': 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=80',
+        'Marketing': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+        'AI Services': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80',
+        'Business': 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+        'Video & Animation': 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=1200&q=80'
+    };
+    return images[category] || 'https://images.unsplash.com/photo-1454165833762-02c50e899e53?auto=format&fit=crop&w=1200&q=80';
+};
+
 const ServiceDetail = () => {
     const { id } = useParams();
     const [service, setService] = useState(null);
@@ -15,13 +28,11 @@ const ServiceDetail = () => {
 
     useEffect(() => {
         const fetchServiceAndReviews = async () => {
+            setLoading(true);
             try {
                 const res = await axios.get(`http://localhost:5000/api/services?_id=${id}`);
-                // The API returns an array, so we pick the first one matching the ID
                 if (res.data.data && res.data.data.length > 0) {
                     setService(res.data.data[0]);
-
-                    // Allow fetch reviews even if service load failed? No, load service first.
                     const reviewRes = await axios.get(`http://localhost:5000/api/reviews/service/${id}`);
                     setReviews(reviewRes.data.data);
                 } else {
@@ -43,11 +54,10 @@ const ServiceDetail = () => {
             navigate('/login');
             return;
         }
-        // Create order then redirect to payment
         try {
             const res = await axios.post('http://localhost:5000/api/orders', {
                 serviceId: service._id,
-                requirements: "Standard requirements placeholder" // In a real app, prompt user for this
+                requirements: "Standard requirements placeholder"
             });
             const orderId = res.data.data._id;
             navigate(`/payment/${orderId}`);
@@ -60,18 +70,39 @@ const ServiceDetail = () => {
         }
     };
 
-    if (loading) return <div className="text-center py-10">Loading...</div>;
-    if (error || !service) return <div className="text-center py-10 text-red-500">{error || 'Service not found'}</div>;
+    if (loading) {
+        return (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-pulse">
+                <div className="lg:grid lg:grid-cols-2 lg:gap-x-8">
+                    <div className="h-96 bg-gray-200 rounded-xl"></div>
+                    <div className="mt-10 lg:mt-0 space-y-6">
+                        <div className="h-10 bg-gray-200 rounded w-3/4"></div>
+                        <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+                        <div className="space-y-2">
+                            <div className="h-4 bg-gray-200 rounded w-full"></div>
+                            <div className="h-4 bg-gray-200 rounded w-full"></div>
+                            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                        </div>
+                        <div className="h-12 bg-gray-200 rounded w-1/2 mt-10"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error || !service) return <div className="text-center py-24 text-red-500 font-bold">{error || 'Service not found'}</div>;
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
+            <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 lg:items-start">
                 {/* Image / Gallery */}
                 <div className="flex flex-col">
-                    <div className="w-full aspect-w-4 aspect-h-3 bg-gray-200 rounded-lg overflow-hidden sm:aspect-w-16 sm:aspect-h-9">
-                        <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
-                            <span className="text-6xl font-bold text-gray-300">{service.category}</span>
-                        </div>
+                    <div className="w-full aspect-w-4 aspect-h-3 bg-gray-200 rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                        <img
+                            src={getCategoryImage(service.category)}
+                            alt={service.title}
+                            className="w-full h-[400px] object-cover"
+                        />
                     </div>
                 </div>
 
