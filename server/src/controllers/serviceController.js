@@ -1,32 +1,46 @@
-const Service = require('../models/Service');
+const supabase = require('../config/supabase');
 
 // @desc    Get all services
 // @route   GET /api/services
 // @access  Public
 exports.getServices = async (req, res, next) => {
     try {
-        let query;
+        let query = supabase.from('services').select('*, freelancer:users(name, email)');
 
-        // Copy req.query
-        const reqQuery = { ...req.query };
+        if (req.query.keyword) {
+            query = query.ilike('title', `%${req.query.keyword}%`);
+        }
 
-        // Fields to exclude
-        const removeFields = ['select', 'sort', 'page', 'limit'];
-        removeFields.forEach(param => delete reqQuery[param]);
+        if (req.query.category) {
+            query = query.eq('category', req.query.category);
+        }
 
-        // Create query string
-        let queryStr = JSON.stringify(reqQuery);
+        const { data: services, error } = await query;
 
-        // Create operators ($gt, $gte, etc)
-        queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-
-        // Finding resource
-        query = Service.find(JSON.parse(queryStr)).populate('freelancer', 'name email');
-
-        // Executing query
-        const services = await query;
+        if (error) throw error;
 
         res.status(200).json({ success: true, count: services.length, data: services });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// @desc    Get single service
+// @route   GET /api/services/:id
+// @access  Public
+exports.getService = async (req, res, next) => {
+    try {
+        const { data: service, error } = await supabase
+            .from('services')
+            .select('*, freelancer:users(name, email)')
+            .eq('id', req.params.id)
+            .single();
+
+        if (error || !service) {
+            return res.status(404).json({ success: false, message: 'Service not found' });
+        }
+
+        res.status(200).json({ success: true, data: service });
     } catch (err) {
         next(err);
     }
@@ -37,17 +51,91 @@ exports.getServices = async (req, res, next) => {
 // @access  Private (Student only)
 exports.createService = async (req, res, next) => {
     try {
-        // Add user to req.body
-        req.body.freelancer = req.user.id;
+        if (req.user.role !== 'student') {
+            return res.status(403).json({ success: false, message: 'Only students can create services' });
+        }
 
-        // Check for existing services (optional limit)
+        const { title, description, category, price, deliveryTime } = req.body;
 
-        const service = await Service.create(req.body);
+        const { data: service, error } = await supabase
+            .from('services')
+            .insert({
+                title,
+                description,
+                category,
+                price,
+                delivery_time: deliveryTime,
+                freelancer_id: req.user.id
+            })
+            .select()
+            .single();
 
-        res.status(201).json({
-            success: true,
-            data: service
-        });
+        if (error) throw error;
+
+        res.status(201).json({ success: true, data: service });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// @desc    Update service
+// @route   PUT /api/services/:id
+// @access  Private (Student only - owner)
+exports.updateService = async (req, res, next) => {
+    try {
+        const { data: service, error: fetchError } = await supabase
+            .from('services')
+            .select('freelancer_id')
+            .eq('id', req.params.id)
+            .single();
+
+        if (fetchError || !service) {
+            return res.status(404).json({ success: false, message: 'Service not found' });
+        }
+
+        if (service.freelancer_id !== req.user.id) {
+            return res.status(401).json({ success: false, message: 'Not authorized' });
+        }
+
+        const { data: updatedService, error } = await supabase
+            .from('services')
+            .update(req.body)
+            .eq('id', req.params.id)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        res.status(200).json({ success: true, data: updatedService });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// @desc    Delete service
+// @route   DELETE /api/services/:id
+// @access  Private (Student only - owner)
+exports.deleteService = async (req, res, next) => {
+    try {
+        const { data: service, error: fetchError } = await supabase
+            .from('services')
+            .select('freelancer_id')
+            .eq('id', req.params.id)
+            .single();
+
+        if (fetchError || !service) {
+            return res.status(404).json({ success: false, message: 'Service not found' });
+        }
+
+        if (service.freelancer_id !== req.user.id) {
+            return res.status(401).json({ success: false, message: 'Not authorized' });
+        }
+
+        const { error } = await supabase.from('services').delete().eq('id', req.params.id);
+
+        if (error) throw error;
+
+        res.status(200).json({ success: true, data: {} });
     } catch (err) {
         next(err);
     }

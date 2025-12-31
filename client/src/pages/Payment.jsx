@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 import { Check, CreditCard, Lock } from 'lucide-react';
 
 const Payment = () => {
@@ -17,9 +17,8 @@ const Payment = () => {
         const fetchOrder = async () => {
             // We are using a hack here: fetching all orders and finding the one matching API.
             // Ideally we should have a getOrderById endpoint.
-            const res = await axios.get('http://localhost:5000/api/orders');
-            const found = res.data.data.find(o => o._id === orderId);
-            if (found) setOrder(found);
+            const res = await api.get(`/api/orders/${orderId}`);
+            setOrder(res.data.data);
             setLoading(false);
         };
         fetchOrder();
@@ -30,8 +29,8 @@ const Payment = () => {
         // Simulate UPI / Gateway delay
         setTimeout(async () => {
             try {
-                await axios.put(`http://localhost:5000/api/orders/${orderId}/status`, {
-                    status: 'in_progress', // Payment success moves order to in_progress
+                await api.put(`/api/orders/${orderId}/status`, {
+                    status: 'In_Progress',
                     paymentStatus: 'completed'
                 });
                 navigate('/dashboard');

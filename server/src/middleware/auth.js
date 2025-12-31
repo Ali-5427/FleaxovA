@@ -1,5 +1,4 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const supabase = require('../config/supabase');
 
 // Protect routes
 exports.protect = async (req, res, next) => {
@@ -9,24 +8,32 @@ exports.protect = async (req, res, next) => {
         req.headers.authorization &&
         req.headers.authorization.startsWith('Bearer')
     ) {
-        // Set token from Bearer token in header
         token = req.headers.authorization.split(' ')[1];
     }
 
-    // Make sure token exists
     if (!token) {
-        return res.status(401).json({ success: false, message: 'Not authorized to access this route' });
+        return res.status(401).json({ success: false, message: 'Not authorized' });
     }
 
     try {
-        // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        // Get user from Supabase Auth
+        const { data: { user }, error } = await supabase.auth.getUser(token);
 
-        req.user = await User.findById(decoded.id);
+        if (error || !user) {
+            return res.status(401).json({ success: false, message: 'Invalid token' });
+        }
 
+        // Fetch additional details from public.users
+        const { data: dbUser } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+        req.user = dbUser || { id: user.id, email: user.email, ...user.user_metadata };
         next();
     } catch (err) {
-        return res.status(401).json({ success: false, message: 'Not authorized to access this route' });
+        return res.status(401).json({ success: false, message: 'Not authorized' });
     }
 };
 

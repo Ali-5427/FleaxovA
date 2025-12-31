@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Check, Shield, Clock, DollarSign, Star } from 'lucide-react';
+import api from '../api/axios';
+import { Check, Shield, Clock, DollarSign, Star, MessageSquare } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const getCategoryImage = (category) => {
@@ -30,13 +30,14 @@ const ServiceDetail = () => {
         const fetchServiceAndReviews = async () => {
             setLoading(true);
             try {
-                const res = await axios.get(`http://localhost:5000/api/services?_id=${id}`);
-                if (res.data.data && res.data.data.length > 0) {
-                    setService(res.data.data[0]);
-                    const reviewRes = await axios.get(`http://localhost:5000/api/reviews/service/${id}`);
+                const res = await api.get(`/api/services/${id}`);
+                setService(res.data.data);
+
+                try {
+                    const reviewRes = await api.get(`/api/reviews/service/${id}`);
                     setReviews(reviewRes.data.data);
-                } else {
-                    setError('Service not found');
+                } catch (err) {
+                    console.error('Error fetching reviews', err);
                 }
             } catch (error) {
                 setError('Error loading service details');
@@ -55,9 +56,9 @@ const ServiceDetail = () => {
             return;
         }
         try {
-            const res = await axios.post('http://localhost:5000/api/orders', {
+            const res = await api.post('/api/orders', {
                 serviceId: service._id,
-                requirements: "Standard requirements placeholder"
+                requirements: "Standard requirements placeholder" // In a real app, prompt user for this
             });
             const orderId = res.data.data._id;
             navigate(`/payment/${orderId}`);
@@ -67,6 +68,20 @@ const ServiceDetail = () => {
             } else {
                 alert('Failed to place order: ' + (err.response?.data?.message || err.message));
             }
+        }
+    };
+
+    const handleContact = async () => {
+        if (!isAuthenticated) return navigate('/login');
+        try {
+            // Check if we already have a conversation or just send an initial message
+            await api.post('/api/messages', {
+                receiver: service.freelancer._id,
+                content: `Hi ${service.freelancer.name}, I'm interested in your service "${service.title}".`
+            });
+            navigate('/messages', { state: { targetUser: service.freelancer } });
+        } catch (err) {
+            alert('Could not start conversation');
         }
     };
 
@@ -132,13 +147,21 @@ const ServiceDetail = () => {
                         </div>
                     </div>
 
-                    <div className="mt-10 flex sm:flex-col1">
+                    <div className="mt-10 flex gap-4">
                         <button
                             onClick={handleOrder}
                             type="button"
-                            className="max-w-xs flex-1 bg-black border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-black sm:w-full"
+                            className="flex-1 bg-black border border-transparent rounded-xl py-4 flex items-center justify-center text-base font-black text-white hover:bg-gray-800 transition-all transform active:scale-95 shadow-xl shadow-black/20"
                         >
                             Order Now
+                        </button>
+                        <button
+                            onClick={handleContact}
+                            type="button"
+                            className="flex-1 bg-white border-2 border-gray-100 rounded-xl py-4 flex items-center justify-center text-base font-black text-black hover:border-black transition-all transform active:scale-95"
+                        >
+                            <MessageSquare className="h-5 w-5 mr-2" />
+                            Contact
                         </button>
                     </div>
 

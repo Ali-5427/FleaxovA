@@ -1,7 +1,4 @@
-const Review = require('../models/Review');
-const Order = require('../models/Order');
-const Service = require('../models/Service');
-const Profile = require('../models/Profile');
+const supabase = require('../config/supabase');
 
 // @desc    Add a review
 // @route   POST /api/reviews
@@ -10,68 +7,57 @@ exports.addReview = async (req, res, next) => {
     try {
         const { orderId, rating, comment } = req.body;
 
-        // 1. Validate Order exists and belongs to user
-        const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
-        }
+        const { data: order, error: oError } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('id', orderId)
+            .single();
 
-        if (order.client.toString() !== req.user.id) {
-            return res.status(401).json({ success: false, message: 'Not authorized to review this order' });
-        }
+        if (oError || !order) return res.status(404).json({ success: false, message: 'Order not found' });
+        if (order.client_id !== req.user.id) return res.status(401).json({ success: false, message: 'Not authorized' });
 
-        if (order.status !== 'completed' && order.status !== 'delivered') {
-            // Depending on logic, maybe only 'completed' orders can be reviewed
-            // For MVP we allow delivered
-        }
+        const { data: review, error: rError } = await supabase
+            .from('reviews')
+            .insert({
+                service_id: order.service_id,
+                reviewer_id: req.user.id,
+                rating,
+                comment
+            })
+            .select()
+            .single();
 
-        // 2. Create Review
-        const review = await Review.create({
-            order: orderId,
-            service: order.service,
-            reviewer: req.user.id,
-            freelancer: order.freelancer,
-            rating,
-            comment
-        });
+        if (rError) throw rError;
 
-        // 3. Update Service average rating (Aggregation) (Simplified for MVP)
-        // In production, use MongoDB Aggregation pipeline. 
-        // Here we will just quick-patch the profile stats.
-
-        // Find Freelancer Profile
-        const profile = await Profile.findOne({ user: order.freelancer });
+        // Update profile rating (Simplified)
+        const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', order.freelancer_id).single();
         if (profile) {
-            const totalRating = (profile.rating * profile.numReviews) + rating;
-            const newNumReviews = profile.numReviews + 1;
-            profile.rating = totalRating / newNumReviews;
-            profile.numReviews = newNumReviews;
-            await profile.save();
+            const numReviews = (profile.num_reviews || 0) + 1;
+            const newRating = ((profile.rating || 0) * (profile.num_reviews || 0) + rating) / numReviews;
+
+            await supabase
+                .from('profiles')
+                .update({ rating: newRating, num_reviews: numReviews })
+                .eq('user_id', order.freelancer_id);
         }
 
-        res.status(201).json({
-            success: true,
-            data: review
-        });
+        res.status(201).json({ success: true, data: review });
     } catch (err) {
         next(err);
     }
 };
 
 // @desc    Get reviews for a service
-// @route   GET /api/reviews/service/:serviceId
-// @access  Public
 exports.getServiceReviews = async (req, res, next) => {
     try {
-        const reviews = await Review.find({ service: req.params.serviceId })
-            .populate('reviewer', 'name')
-            .sort({ createdAt: -1 });
+        const { data: reviews, error } = await supabase
+            .from('reviews')
+            .select('*, reviewer:users(name)')
+            .eq('service_id', req.params.serviceId)
+            .order('created_at', { ascending: false });
 
-        res.status(200).json({
-            success: true,
-            count: reviews.length,
-            data: reviews
-        });
+        if (error) throw error;
+        res.status(200).json({ success: true, count: reviews.length, data: reviews });
     } catch (err) {
         next(err);
     }

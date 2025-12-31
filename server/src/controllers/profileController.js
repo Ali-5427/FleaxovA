@@ -1,14 +1,18 @@
-const Profile = require('../models/Profile');
+const supabase = require('../config/supabase');
 
 // @desc    Get current user's profile
 // @route   GET /api/profiles/me
 // @access  Private
 exports.getMyProfile = async (req, res, next) => {
     try {
-        const profile = await Profile.findOne({ user: req.user.id }).populate('user', ['name', 'email']);
+        const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*, user:users(name, email)')
+            .eq('user_id', req.user.id)
+            .single();
 
-        if (!profile) {
-            return res.status(404).json({ success: false, message: 'There is no profile for this user' });
+        if (error || !profile) {
+            return res.status(404).json({ success: false, message: 'Profile not found' });
         }
 
         res.status(200).json({ success: true, data: profile });
@@ -21,41 +25,25 @@ exports.getMyProfile = async (req, res, next) => {
 // @route   POST /api/profiles
 // @access  Private
 exports.updateProfile = async (req, res, next) => {
-    const {
-        title,
-        bio,
-        skills,
-        portfolio,
-        socials
-    } = req.body;
-
-    // Build profile object
-    const profileFields = {};
-    profileFields.user = req.user.id;
-    if (title) profileFields.title = title;
-    if (bio) profileFields.bio = bio;
-    if (skills) {
-        // Split into array if string comma separated, else assume array
-        profileFields.skills = Array.isArray(skills) ? skills : skills.split(',').map(skill => skill.trim());
-    }
-    if (portfolio) profileFields.portfolio = portfolio;
-    if (socials) profileFields.socials = socials;
-
     try {
-        let profile = await Profile.findOne({ user: req.user.id });
+        const { title, bio, skills, portfolio, socials } = req.body;
 
-        if (profile) {
-            // Update
-            profile = await Profile.findOneAndUpdate(
-                { user: req.user.id },
-                { $set: profileFields },
-                { new: true }
-            );
-        } else {
-            // Create
-            profile = new Profile(profileFields);
-            await profile.save();
-        }
+        const profileFields = {
+            user_id: req.user.id,
+            title,
+            bio,
+            skills: Array.isArray(skills) ? skills : (skills ? skills.split(',').map(s => s.trim()) : []),
+            portfolio,
+            social_links: socials || {}
+        };
+
+        const { data: profile, error } = await supabase
+            .from('profiles')
+            .upsert(profileFields, { onConflict: 'user_id' })
+            .select()
+            .single();
+
+        if (error) throw error;
 
         res.json({ success: true, data: profile });
     } catch (err) {
@@ -68,7 +56,12 @@ exports.updateProfile = async (req, res, next) => {
 // @access  Public
 exports.getProfiles = async (req, res, next) => {
     try {
-        const profiles = await Profile.find().populate('user', ['name', 'email']);
+        const { data: profiles, error } = await supabase
+            .from('profiles')
+            .select('*, user:users(name, email)');
+
+        if (error) throw error;
+
         res.json({ success: true, count: profiles.length, data: profiles });
     } catch (err) {
         next(err);

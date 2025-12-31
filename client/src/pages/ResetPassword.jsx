@@ -1,21 +1,28 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const Login = () => {
-    const [formData, setFormData] = useState({ email: '', password: '' });
+const ResetPassword = () => {
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
-    const { login } = useAuth();
+    const { token } = useParams();
+    const { resetPassword } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (password !== confirmPassword) {
+            return setError('Passwords do not match');
+        }
+
         try {
-            await login(formData.email, formData.password);
-            navigate('/');
+            await resetPassword(token, password);
+            navigate('/dashboard');
         } catch (err) {
-            setError(err.response?.data?.message || 'Login failed');
+            setError(err.response?.data?.message || 'Reset failed');
         }
     };
 
@@ -24,20 +31,21 @@ const Login = () => {
             <div className="max-w-md w-full space-y-8">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Sign in to FleaxovA
+                        Set New Password
                     </h2>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     {error && <div className="text-red-500 text-center text-sm">{error}</div>}
+
                     <div className="rounded-md shadow-sm -space-y-px">
                         <div>
                             <input
-                                type="email"
+                                type="password"
                                 required
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
-                                placeholder="Email address"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                placeholder="New Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                             />
                         </div>
                         <div>
@@ -45,30 +53,10 @@ const Login = () => {
                                 type="password"
                                 required
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
-                                placeholder="Password"
-                                value={formData.password}
-                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                placeholder="Confirm New Password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
                             />
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                            <input
-                                id="remember-me"
-                                name="remember-me"
-                                type="checkbox"
-                                className="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
-                            />
-                            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                                Remember me
-                            </label>
-                        </div>
-
-                        <div className="text-sm">
-                            <Link to="/forgot-password" self-label="forgot-password" className="font-medium text-black hover:text-gray-900">
-                                Forgot your password?
-                            </Link>
                         </div>
                     </div>
 
@@ -77,19 +65,13 @@ const Login = () => {
                             type="submit"
                             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
                         >
-                            Sign in
+                            Reset Password
                         </button>
                     </div>
                 </form>
-                <div className="text-center text-sm">
-                    <span className="text-gray-500">Don't have an account? </span>
-                    <Link to="/register" className="font-medium text-black hover:text-gray-900">
-                        Sign up
-                    </Link>
-                </div>
             </div>
         </div>
     );
 };
 
-export default Login;
+export default ResetPassword;

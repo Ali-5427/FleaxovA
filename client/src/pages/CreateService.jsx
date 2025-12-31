@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 
 const CreateService = () => {
@@ -37,7 +37,7 @@ const CreateService = () => {
         setLoading(true);
 
         try {
-            await axios.post('http://localhost:5000/api/services', formData);
+            await api.post('/api/services', formData);
             navigate('/dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to create service. Please check your connection.');

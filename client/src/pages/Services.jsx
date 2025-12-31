@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
+import api from '../api/axios';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const SkeletonCard = () => (
     <div className="bg-white border border-gray-200 rounded-lg flex flex-col overflow-hidden animate-pulse">
@@ -31,19 +31,29 @@ const getCategoryImage = (category) => {
 };
 
 const Services = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const urlKeyword = searchParams.get('keyword') || '';
+
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [category, setCategory] = useState('');
+    const [keyword, setKeyword] = useState(urlKeyword);
+
+    // Sync state with URL params
+    useEffect(() => {
+        setKeyword(urlKeyword);
+    }, [urlKeyword]);
 
     useEffect(() => {
         const fetchServices = async () => {
             setLoading(true);
             try {
-                let url = 'http://localhost:5000/api/services';
-                if (category) {
-                    url += `?category=${category}`;
-                }
-                const res = await axios.get(url);
+                let url = '/api/services';
+                const params = new URLSearchParams();
+                if (category) params.append('category', category);
+                if (keyword) params.append('keyword', keyword);
+
+                const res = await api.get(`${url}?${params.toString()}`);
                 setServices(res.data.data);
             } catch (error) {
                 console.error('Error fetching services', error);
@@ -52,8 +62,12 @@ const Services = () => {
             }
         };
 
-        fetchServices();
-    }, [category]);
+        const timeoutId = setTimeout(() => {
+            fetchServices();
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+    }, [category, keyword]);
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -62,7 +76,21 @@ const Services = () => {
                     <h1 className="text-3xl font-bold text-gray-900">Explore Services</h1>
                     <p className="text-gray-500 mt-1">Unlock professional student talent for your project.</p>
                 </div>
-                <div className="mt-4 md:mt-0">
+                <div className="mt-4 md:mt-0 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Search services..."
+                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                            value={keyword}
+                            onChange={(e) => setKeyword(e.target.value)}
+                        />
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
                     <select
                         className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-black focus:border-black sm:text-sm rounded-md"
                         value={category}

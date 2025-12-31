@@ -13,9 +13,8 @@
         *   Uses `bcryptjs` for password hashing and `jsonwebtoken` for secure sessions.
         *   Frontend Login/Register pages with Role Selection (Student/Client).
         *   protected routes using `auth` middleware.
-*   **Pending**: 
-    *   Email/Phone verification (OTP integration).
-    *   Password reset flow (Forgot Password UI/Backend).
+        *   **OTP Integration**: 6-digit mock OTP sent on Register (console logged); required for email verification.
+        *   **Password Reset**: Secure token-based reset flow with mock email linkage.
 
 ## 2. Student Freelancer Profiles
 *   **Requirement**: Skill listing, Portfolio section, Pricing, Verification badge.
@@ -25,7 +24,6 @@
         *   **Frontend**: `EditProfile.jsx` allows students to build their professional identity.
         *   **Backend**: `profileRoutes` successfully handle fetching and updating.
 *   **Pending**:
-    *   Automatic "Verified Badge" logic (currently just a boolean flag in DB).
     *   Rich-text editor for Portfolio descriptions.
 
 ## 3. Service Marketplace
@@ -68,11 +66,13 @@
 
 ## 7. Admin Panel
 *   **Requirement**: User management, Service moderation, Platform analytics.
-*   **Status**: ❌ **PENDING**
-    *   **Implementation**: None (Only `role: "admin"` flag exists in User model).
-*   **Pending**:
-    *   Dashboard for banning users.
-    *   Analytics charts (Total Rev, Active Orders).
+*   **Status**: ✅ **Partially COMPLETED**
+    *   **Implementation**: 
+        *   **Verification Workflow**: Students submit ID proof via `EditProfile`.
+        *   **Admin Panel**: Minimal dashboard for admins to approve/reject student verification requests.
+    *   **Pending**:
+        *   Dashboard for banning users.
+        *   Analytics charts (Total Rev, Active Orders).
 
 ---
 

@@ -27,9 +27,33 @@ const UserSchema = new mongoose.Schema({
         enum: ['student', 'client', 'admin'],
         default: 'client'
     },
+    company: {
+        name: String,
+        website: String,
+        industry: String
+    },
     isVerified: {
         type: Boolean,
         default: false
+    },
+    otp: String,
+    otpExpire: Date,
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+    verificationStatus: {
+        type: String,
+        enum: ['none', 'pending', 'verified', 'rejected'],
+        default: 'none'
+    },
+    verificationDocument: String,
+    wallet: {
+        balance: { type: Number, default: 0 },
+        transactions: [{
+            amount: Number,
+            type: { type: String, enum: ['credit', 'debit'] },
+            description: String,
+            date: { type: Date, default: Date.now }
+        }]
     },
     createdAt: {
         type: Date,
