@@ -6,7 +6,7 @@
         "server": "cd server && npm run dev",
         "client": "cd client && npm run dev",
         "install-all": "cd server && npm install && cd ../client && npm install",
-        "build": "cd client && npm install && npm run build",
+        "build": "cd client && npm install --include=dev && npm run build",
         "dev": "concurrently \"npm run server\" \"npm run client\""
     },
     "dependencies": {
