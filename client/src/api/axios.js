@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000'
+    baseURL: import.meta.env.VITE_API_URL || '/api'
 });
 
 // Add a request interceptor to add the auth token to every request
