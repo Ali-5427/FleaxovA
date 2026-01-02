@@ -22,9 +22,13 @@ const Register = () => {
         setError('');
         try {
             const res = await register(formData.name, formData.email, formData.password, formData.role);
-            setStep('otp');
-            setMessage(res.message);
-            if (res.otp_mock) setMockOtp(res.otp_mock);
+            if (res.token) {
+                navigate('/');
+            } else {
+                setStep('otp');
+                setMessage(res.message);
+                if (res.otp_mock) setMockOtp(res.otp_mock);
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed');
         }

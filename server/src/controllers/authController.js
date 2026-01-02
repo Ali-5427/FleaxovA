@@ -40,9 +40,37 @@ exports.register = async (req, res, next) => {
 
         if (dbError) console.error('Error syncing to public users:', dbError.message);
 
+        // Automatically verify for demo
+        try {
+            // Try to confirm email using Admin API if available
+            if (supabase.auth.admin) {
+                await supabase.auth.admin.updateUserById(authData.user.id, { email_confirm: true });
+            }
+
+            // Sign in to get token
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+
+            if (!signInError) {
+                // Cleanup
+                delete otpStore[email];
+
+                return res.status(200).json({
+                    success: true,
+                    message: 'Registration and login successful.',
+                    data: signInData.user,
+                    token: signInData.session.access_token
+                });
+            }
+        } catch (verifyError) {
+            console.log('Auto verify failed:', verifyError.message);
+        }
+
         res.status(200).json({
             success: true,
-            message: 'Registration successful. Please check your email for verification link.',
+            message: 'Registration successful. Please verify your email.',
             data: authData.user,
             otp_mock: otp // send mock OTP to frontend for demo
         });
@@ -64,6 +92,8 @@ exports.login = async (req, res, next) => {
         });
 
         if (error) {
+            console.error("Supabase Login Error:", error.message);
+
             return res.status(401).json({ success: false, message: error.message });
         }
 
@@ -73,6 +103,7 @@ exports.login = async (req, res, next) => {
             user: data.user
         });
     } catch (err) {
+        console.error("Login Server Error:", err);
         next(err);
     }
 };
