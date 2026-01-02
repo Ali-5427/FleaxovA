@@ -1,4 +1,6 @@
 const supabase = require('../config/supabase');
+// Simple in-memory OTP store for demo purposes
+const otpStore = {};
 const crypto = require('crypto');
 
 // @desc    Register user
@@ -30,12 +32,19 @@ exports.register = async (req, res, next) => {
             role: role || 'client'
         });
 
+        // Generate a mock OTP for demo purposes (6‑digit numeric)
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        // Store otp AND password explicitly for the verify step (Demo only!)
+        otpStore[email] = { otp, password, userId: authData.user.id };
+        console.log(`Generated OTP for ${email}: ${otp}`);
+
         if (dbError) console.error('Error syncing to public users:', dbError.message);
 
         res.status(200).json({
             success: true,
             message: 'Registration successful. Please check your email for verification link.',
-            data: authData.user
+            data: authData.user,
+            otp_mock: otp // send mock OTP to frontend for demo
         });
     } catch (err) {
         next(err);
@@ -63,6 +72,67 @@ exports.login = async (req, res, next) => {
             token: data.session.access_token,
             user: data.user
         });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// @desc    Verify email OTP (demo)
+// @route   POST /api/auth/verify-email
+// @access  Public
+exports.verifyEmail = async (req, res, next) => {
+    try {
+        const { email, otp } = req.body;
+        const storedData = otpStore[email];
+
+        if (!storedData) {
+            return res.status(400).json({ success: false, message: 'No OTP found for this email (or it expired).' });
+        }
+
+        // Handle both simple string (old way) and object (new way)
+        const storedOtp = typeof storedData === 'string' ? storedData : storedData.otp;
+
+        if (storedOtp !== otp) {
+            return res.status(400).json({ success: false, message: 'Invalid OTP.' });
+        }
+
+        // Try to confirm email using Admin API if available
+        if (storedData.userId && supabase.auth.admin) {
+            const { error: verifyError } = await supabase.auth.admin.updateUserById(
+                storedData.userId,
+                { email_confirm: true }
+            );
+            if (verifyError) {
+                console.log('Admin verify failed (possibly due to key permissions):', verifyError.message);
+            }
+        }
+
+        // Sign in to get token
+        const passwordToUse = storedData.password;
+
+        if (passwordToUse) {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password: passwordToUse
+            });
+
+            if (error) {
+                return res.status(401).json({ success: false, message: error.message });
+            }
+
+            // Cleanup
+            delete otpStore[email];
+
+            return res.status(200).json({
+                success: true,
+                token: data.session.access_token,
+                user: data.user
+            });
+        } else {
+            // Fallback for old sessions or missing password
+            return res.status(400).json({ success: false, message: 'Session expired, please login manually.' });
+        }
+
     } catch (err) {
         next(err);
     }
