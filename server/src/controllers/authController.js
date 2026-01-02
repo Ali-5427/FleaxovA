@@ -10,6 +10,8 @@ exports.register = async (req, res, next) => {
     try {
         const { name, email, password, role } = req.body;
 
+        console.log('Registering user:', { name, email, role });
+
         // Register in Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
@@ -22,7 +24,12 @@ exports.register = async (req, res, next) => {
             }
         });
 
-        if (authError) return res.status(400).json({ success: false, message: authError.message });
+        if (authError) {
+            console.error("Supabase Auth Error:", authError.message);
+            return res.status(400).json({ success: false, message: authError.message });
+        }
+
+        console.log('Auth signup success:', authData.user.id);
 
         // Add to public.users table (Sync)
         const { error: dbError } = await supabase.from('users').insert({
@@ -32,13 +39,18 @@ exports.register = async (req, res, next) => {
             role: role || 'client'
         });
 
+        if (dbError) {
+            console.error('Database insert error:', dbError.message);
+            return res.status(400).json({ success: false, message: 'User created but database sync failed: ' + dbError.message });
+        }
+
+        console.log('Database insert success');
+
         // Generate a mock OTP for demo purposes (6‑digit numeric)
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         // Store otp AND password explicitly for the verify step (Demo only!)
         otpStore[email] = { otp, password, userId: authData.user.id };
         console.log(`Generated OTP for ${email}: ${otp}`);
-
-        if (dbError) console.error('Error syncing to public users:', dbError.message);
 
         // Automatically verify for demo
         try {
