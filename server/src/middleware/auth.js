@@ -20,6 +20,7 @@ exports.protect = async (req, res, next) => {
         const { data: { user }, error } = await supabase.auth.getUser(token);
 
         if (error || !user) {
+            console.error('🔓 Auth Failure:', error?.message || 'No user found');
             return res.status(401).json({ success: false, message: 'Invalid token' });
         }
 
@@ -28,9 +29,15 @@ exports.protect = async (req, res, next) => {
             .from('users')
             .select('*')
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
 
-        req.user = dbUser || { id: user.id, email: user.email, ...user.user_metadata };
+        req.user = dbUser || {
+            id: user.id,
+            email: user.email,
+            role: user.user_metadata?.role || 'client',
+            name: user.user_metadata?.name || user.email.split('@')[0],
+            wallet_balance: 0
+        };
         next();
     } catch (err) {
         return res.status(401).json({ success: false, message: 'Not authorized' });

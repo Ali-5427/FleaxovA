@@ -1,7 +1,21 @@
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { ArrowRight, CheckCircle, Shield, Zap } from 'lucide-react';
 
 const Home = () => {
+    const { isAuthenticated, user } = useAuth();
+    const navigate = useNavigate();
+
+    // Removed automatic redirect to dashboard to allow users to stay on Home page
+    /*
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/dashboard');
+        }
+    }, [isAuthenticated, navigate]);
+    */
+
     return (
         <div className="bg-white">
             {/* Hero Section */}
@@ -10,25 +24,51 @@ const Home = () => {
                     <div className="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
                         <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
                             <div className="sm:text-center lg:text-left">
-                                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                                    <span className="block xl:inline">Premium Freelancing</span>{' '}
-                                    <span className="block text-black">Exclusively for Students</span>
-                                </h1>
-                                <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                                    FleaxovA connects ambitious student freelancers with real clients. No free work. Secure payments. Corporate-grade professionalism.
-                                </p>
-                                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                                    <div className="rounded-md shadow">
-                                        <Link to="/register" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-black hover:bg-gray-800 md:py-4 md:text-lg md:px-10">
-                                            Get Started
-                                        </Link>
-                                    </div>
-                                    <div className="mt-3 sm:mt-0 sm:ml-3">
-                                        <Link to="/services" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-black bg-gray-100 hover:bg-gray-200 md:py-4 md:text-lg md:px-10">
-                                            Find Talent
-                                        </Link>
-                                    </div>
-                                </div>
+                                {isAuthenticated ? (
+                                    <>
+                                        <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                                            <span className="block xl:inline">Welcome back,</span>{' '}
+                                            <span className="block text-black">{user?.name}</span>
+                                        </h1>
+                                        <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                                            Your command center for high-quality student projects. Browse fresh services, track your active orders, or manage your latest job applications.
+                                        </p>
+                                        <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                                            <div className="rounded-md shadow">
+                                                <Link to="/services" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-black hover:bg-gray-800 md:py-4 md:text-lg md:px-10">
+                                                    Browse Services
+                                                </Link>
+                                            </div>
+                                            <div className="mt-3 sm:mt-0 sm:ml-3">
+                                                <Link to="/jobs" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-black bg-gray-100 hover:bg-gray-200 md:py-4 md:text-lg md:px-10">
+                                                    Find Work
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                                            <span className="block xl:inline">Premium Freelancing</span>{' '}
+                                            <span className="block text-black">Exclusively for Students</span>
+                                        </h1>
+                                        <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                                            FleaxovA connects ambitious student freelancers with real clients. No free work. Secure payments. Corporate-grade professionalism.
+                                        </p>
+                                        <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                                            <div className="rounded-md shadow">
+                                                <Link to="/register" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-black hover:bg-gray-800 md:py-4 md:text-lg md:px-10">
+                                                    Get Started
+                                                </Link>
+                                            </div>
+                                            <div className="mt-3 sm:mt-0 sm:ml-3">
+                                                <Link to="/services" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-black bg-gray-100 hover:bg-gray-200 md:py-4 md:text-lg md:px-10">
+                                                    Find Talent
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </main>
                     </div>
@@ -72,7 +112,7 @@ const Home = () => {
                             <div className="relative">
                                 <dt>
                                     <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-black text-white">
-                                        <CheckCircle className="h-6 w-6" aria-hidden="true" />
+                                        <Shield className="h-6 w-6" aria-hidden="true" />
                                     </div>
                                     <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Verified Students</p>
                                 </dt>

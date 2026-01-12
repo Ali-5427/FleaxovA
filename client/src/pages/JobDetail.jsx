@@ -4,6 +4,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Clock, IndianRupee, Briefcase, User, Calendar, ShieldCheck, Mail, ArrowLeft } from 'lucide-react';
 
+const getCategoryImage = (category) => {
+    const images = {
+        'Development': 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+        'Design': 'https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1200&q=80',
+        'Writing': 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=80',
+        'Marketing': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+        'AI Services': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80',
+    };
+    return images[category] || 'https://images.unsplash.com/photo-1454165833762-02c50e899e53?auto=format&fit=crop&w=1200&q=80';
+};
+
 const JobDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -21,7 +32,7 @@ const JobDetail = () => {
                 const res = await api.get(`/api/jobs/${id}`);
                 setJob(res.data.data);
 
-                if (user?.role === 'student') {
+                if (user?.role === 'student' || user?.role === 'freelancer') {
                     const appsRes = await api.get('/api/applications');
                     const hasApplied = appsRes.data.data.some(app => app.job?._id === id);
                     setApplied(hasApplied);
@@ -75,7 +86,7 @@ const JobDetail = () => {
                     </button>
                     <div className="flex items-center space-x-2">
                         <span className="text-[10px] uppercase tracking-widest font-black text-gray-400">Post ID</span>
-                        <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded">#{job._id.substring(0, 8)}</span>
+                        <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded">#{job._id?.substring(0, 8)}</span>
                     </div>
                 </div>
             </div>
@@ -85,47 +96,57 @@ const JobDetail = () => {
 
                     {/* Left Column: Job Details */}
                     <div className="lg:col-span-2 space-y-8">
-                        <div className="bg-white rounded-3xl p-8 sm:p-10 shadow-xl shadow-black/5 border border-gray-100">
-                            <div className="flex flex-wrap gap-3 mb-6">
-                                <span className="bg-black text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider">
-                                    {job.category}
-                                </span>
-                                <span className="bg-green-100 text-green-800 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider">
-                                    {job.status}
-                                </span>
-                            </div>
-
-                            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 leading-tight mb-6">
-                                {job.title}
-                            </h1>
-
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 py-8 border-y border-gray-100 mb-8">
-                                <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center">
-                                        <Briefcase className="h-3 w-3 mr-1" />
-                                        Work Type
+                        <div className="bg-white rounded-3xl overflow-hidden shadow-xl shadow-black/5 border border-gray-100 flex flex-col">
+                            <div className="h-64 sm:h-80 w-full relative">
+                                <img
+                                    src={job.images && job.images.length > 0 ? job.images[0] : getCategoryImage(job.category)}
+                                    alt={job.title}
+                                    className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                <div className="absolute bottom-6 left-8 flex flex-wrap gap-3">
+                                    <span className="bg-white text-black px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">
+                                        {job.category}
                                     </span>
-                                    <span className="text-lg font-black text-gray-900">Fixed Budget</span>
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center">
-                                        <IndianRupee className="h-3 w-3 mr-1" />
-                                        Budget
+                                    <span className="bg-green-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">
+                                        {job.status}
                                     </span>
-                                    <span className="text-lg font-black text-gray-900">₹{job.budget?.toLocaleString()}</span>
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center">
-                                        <Clock className="h-3 w-3 mr-1" />
-                                        Timeline
-                                    </span>
-                                    <span className="text-lg font-black text-gray-900">{job.deadline} Days</span>
                                 </div>
                             </div>
 
-                            <h3 className="text-xl font-black text-gray-900 mb-4">Project Description</h3>
-                            <div className="text-gray-600 leading-loose text-lg whitespace-pre-line">
-                                {job.description}
+                            <div className="p-8 sm:p-10">
+                                <h1 className="text-4xl sm:text-5xl font-black text-gray-900 leading-tight mb-6">
+                                    {job.title}
+                                </h1>
+
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 py-8 border-y border-gray-100 mb-8">
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center">
+                                            <Briefcase className="h-3 w-3 mr-1" />
+                                            Work Type
+                                        </span>
+                                        <span className="text-lg font-black text-gray-900">Fixed Budget</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center">
+                                            <IndianRupee className="h-3 w-3 mr-1" />
+                                            Budget
+                                        </span>
+                                        <span className="text-lg font-black text-gray-900">₹{job.budget?.toLocaleString()}</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center">
+                                            <Clock className="h-3 w-3 mr-1" />
+                                            Timeline
+                                        </span>
+                                        <span className="text-lg font-black text-gray-900">{job.deadline} Days</span>
+                                    </div>
+                                </div>
+
+                                <h3 className="text-xl font-black text-gray-900 mb-4">Project Description</h3>
+                                <div className="text-gray-600 leading-loose text-lg whitespace-pre-line">
+                                    {job.description}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -165,7 +186,7 @@ const JobDetail = () => {
                                 </div>
                             </div>
 
-                            {user?.role === 'student' && job.status === 'open' && !applied && !showApplyForm && (
+                            {(user?.role === 'student' || user?.role === 'freelancer') && job.status === 'open' && !applied && !showApplyForm && (
                                 <button
                                     onClick={() => setShowApplyForm(true)}
                                     className="w-full py-4 bg-black text-white font-black rounded-2xl shadow-xl shadow-black/20 hover:bg-gray-800 transition-all transform active:scale-95 flex items-center justify-center"

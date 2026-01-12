@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.use(protect);
 
-router.post('/', authorize('student', 'admin'), applyToJob);
+router.post('/', authorize('student', 'freelancer', 'admin'), applyToJob);
 router.get('/', getApplications);
 router.get('/job/:jobId', getJobApplications);
 router.put('/:id', updateApplicationStatus);

@@ -1,0 +1,720 @@
+[
+  {
+    "id": "TC001",
+    "title": "User Registration with Valid Data",
+    "description": "Verify that a new user can successfully register as a student or client with valid inputs, receives a verification email, and can login.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the registration page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in required fields with valid data and select role (student or client)"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Registration is successful and a verification email is sent"
+      },
+      {
+        "type": "action",
+        "description": "Verify email via link received"
+      },
+      {
+        "type": "action",
+        "description": "Proceed to login page and enter the registered credentials"
+      },
+      {
+        "type": "action",
+        "description": "Submit login form"
+      },
+      {
+        "type": "assertion",
+        "description": "User is logged in and JWT token is received"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "User Registration with Invalid Data",
+    "description": "Verify registration fails with missing or invalid input fields (e.g., email format, password constraints).",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the registration page"
+      },
+      {
+        "type": "action",
+        "description": "Fill registration form with invalid email and weak password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Appropriate validation error messages are displayed and registration is blocked"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Password Reset Flow",
+    "description": "Verify that a user can request password reset, receive an email with reset link, and successfully reset password.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Forgot Password page"
+      },
+      {
+        "type": "action",
+        "description": "Enter registered email and submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Password reset email with valid link is sent"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to reset password page via link"
+      },
+      {
+        "type": "action",
+        "description": "Enter and confirm new valid password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the reset form"
+      },
+      {
+        "type": "assertion",
+        "description": "Password is updated and user can login with new password"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Student Freelancer Profile Creation and Editing",
+    "description": "Verify that verified student freelancers can create and update their profile including skills, portfolio, bio, and social links.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as a verified student freelancer"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to profile creation/edit page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in profile details: add skills, upload portfolio items, enter bio and social links"
+      },
+      {
+        "type": "action",
+        "description": "Submit profile form"
+      },
+      {
+        "type": "assertion",
+        "description": "Profile data is saved and displayed correctly on the profile page"
+      },
+      {
+        "type": "action",
+        "description": "Edit some profile fields and submit updates"
+      },
+      {
+        "type": "assertion",
+        "description": "Profile updates are persisted and displayed correctly"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Service Listing Creation and Validation",
+    "description": "Verify that student freelancers can create paid service listings with proper validations including category selection and pricing above zero.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as a verified student freelancer"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to create service page"
+      },
+      {
+        "type": "action",
+        "description": "Enter valid service title, description, select category, upload images/portfolio, set a positive price"
+      },
+      {
+        "type": "action",
+        "description": "Submit the service listing"
+      },
+      {
+        "type": "assertion",
+        "description": "Service is created and visible in marketplace"
+      },
+      {
+        "type": "action",
+        "description": "Attempt service creation with zero or negative price"
+      },
+      {
+        "type": "assertion",
+        "description": "Validation error prevents listing creation"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Browse and Search Service Marketplace by Category",
+    "description": "Verify clients and students can browse service marketplace, filter by category, search keywords, and view service details.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as any user"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to services marketplace page"
+      },
+      {
+        "type": "action",
+        "description": "Filter services by selected category"
+      },
+      {
+        "type": "assertion",
+        "description": "Marketplace displays only services in selected category"
+      },
+      {
+        "type": "action",
+        "description": "Perform a keyword search in service marketplace"
+      },
+      {
+        "type": "assertion",
+        "description": "Search results are relevant and displayed properly"
+      },
+      {
+        "type": "action",
+        "description": "Click a service listing to view detailed page"
+      },
+      {
+        "type": "assertion",
+        "description": "Service detail page shows correct info including pricing, description, and freelancer profile"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Job Posting and Application Management",
+    "description": "Verify clients can post jobs with details and students can apply. Applications are manageable and visible to both parties.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as client user"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to create job page"
+      },
+      {
+        "type": "action",
+        "description": "Enter job title, description, category, budget, and submission deadline"
+      },
+      {
+        "type": "action",
+        "description": "Submit job posting"
+      },
+      {
+        "type": "assertion",
+        "description": "Job is listed on job board and visible to student users"
+      },
+      {
+        "type": "action",
+        "description": "Login as student user"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to job listings"
+      },
+      {
+        "type": "action",
+        "description": "Select a job and submit an application with cover letter"
+      },
+      {
+        "type": "assertion",
+        "description": "Application is recorded and visible to client"
+      },
+      {
+        "type": "action",
+        "description": "Client reviews applications and selects candidate"
+      },
+      {
+        "type": "assertion",
+        "description": "Application status updates and notifications sent properly"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Order Creation and Status Workflow",
+    "description": "Verify clients can place orders on services with payment before acceptance, and orders progress through statuses from acceptance, delivery submission, to completion.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as client"
+      },
+      {
+        "type": "action",
+        "description": "Browse a paid service and place an order"
+      },
+      {
+        "type": "action",
+        "description": "Complete payment and confirm order"
+      },
+      {
+        "type": "assertion",
+        "description": "Order is created with status 'Pending Acceptance'"
+      },
+      {
+        "type": "action",
+        "description": "Freelancer logs in and accepts the order"
+      },
+      {
+        "type": "assertion",
+        "description": "Order status updates to 'In Progress'"
+      },
+      {
+        "type": "action",
+        "description": "Freelancer submits delivery work through order management system"
+      },
+      {
+        "type": "assertion",
+        "description": "Client receives notification of delivery submission"
+      },
+      {
+        "type": "action",
+        "description": "Client reviews delivery and approves or requests revision"
+      },
+      {
+        "type": "assertion",
+        "description": "Order status updates accordingly to 'Completed' or 'Revisions Requested'"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Payment Wallet and Withdrawal Process",
+    "description": "Verify wallet balance updates after payments and commissions, and withdrawal requests by freelancers are handled with admin approval.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as freelancer"
+      },
+      {
+        "type": "action",
+        "description": "Check initial wallet balance"
+      },
+      {
+        "type": "action",
+        "description": "Complete service order and receive payment"
+      },
+      {
+        "type": "assertion",
+        "description": "Wallet balance reflects payment minus platform commission"
+      },
+      {
+        "type": "action",
+        "description": "Request withdrawal of available balance"
+      },
+      {
+        "type": "assertion",
+        "description": "Withdrawal request is recorded and pending admin approval"
+      },
+      {
+        "type": "action",
+        "description": "Admin logs in and reviews withdrawal requests"
+      },
+      {
+        "type": "action",
+        "description": "Admin approves a withdrawal"
+      },
+      {
+        "type": "assertion",
+        "description": "Wallet balance is decremented and withdrawal marked as completed"
+      },
+      {
+        "type": "action",
+        "description": "Attempt withdrawal exceeding wallet balance"
+      },
+      {
+        "type": "assertion",
+        "description": "Withdrawal request is rejected with appropriate error"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Real-Time Messaging Functionality",
+    "description": "Verify users can send and receive real-time messages, and message statuses (delivered, read) update correctly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as client user in one browser/session"
+      },
+      {
+        "type": "action",
+        "description": "Login as freelancer user in another browser/session"
+      },
+      {
+        "type": "action",
+        "description": "Client sends message to freelancer"
+      },
+      {
+        "type": "assertion",
+        "description": "Freelancer receives the message instantly"
+      },
+      {
+        "type": "action",
+        "description": "Freelancer reads message"
+      },
+      {
+        "type": "assertion",
+        "description": "Client sees message read status"
+      },
+      {
+        "type": "action",
+        "description": "Freelancer replies and client receives it in real-time"
+      },
+      {
+        "type": "assertion",
+        "description": "Message delivery and read receipts function correctly"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Review and Rating Submission After Order Completion",
+    "description": "Verify clients can submit reviews and star ratings only after order completion, with anti-spam measures to prevent multiple submissions.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Complete an order as client"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to review submission page for the completed order"
+      },
+      {
+        "type": "action",
+        "description": "Submit star rating and text review"
+      },
+      {
+        "type": "assertion",
+        "description": "Review is saved and displayed on freelancer profile"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to submit a second review for the same order"
+      },
+      {
+        "type": "assertion",
+        "description": "Second review is blocked by anti-spam control"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to submit review before order completion"
+      },
+      {
+        "type": "assertion",
+        "description": "Review submission is disallowed and error shown"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Notification System for Orders and Messages",
+    "description": "Verify that notifications are generated for order status updates and new messages with accurate read/unread states and persistence.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as client and place order"
+      },
+      {
+        "type": "action",
+        "description": "Login as freelancer and accept order"
+      },
+      {
+        "type": "assertion",
+        "description": "Client receives notification about order acceptance"
+      },
+      {
+        "type": "action",
+        "description": "Client sends a message to freelancer"
+      },
+      {
+        "type": "assertion",
+        "description": "Freelancer receives a notification for the new message"
+      },
+      {
+        "type": "action",
+        "description": "User views notification panel and marks notifications as read"
+      },
+      {
+        "type": "assertion",
+        "description": "Notifications read/unread status updates and persists across sessions"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Personalized Dashboard Data Accuracy",
+    "description": "Verify that dashboards for students and clients accurately reflect active orders, engagements, services, jobs, and relevant analytics in real-time.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as student"
+      },
+      {
+        "type": "assertion",
+        "description": "Dashboard shows active orders, services listed, application statuses, and personal analytics accurately"
+      },
+      {
+        "type": "action",
+        "description": "Login as client"
+      },
+      {
+        "type": "assertion",
+        "description": "Dashboard shows posted jobs, active orders, engagements, and analytics accurately"
+      },
+      {
+        "type": "action",
+        "description": "Place new orders, accept jobs, create services"
+      },
+      {
+        "type": "assertion",
+        "description": "Dashboard updates reflect changes in less than 5 seconds"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Admin Panel - User and Service Moderation",
+    "description": "Verify admin users can view, search, and moderate user accounts and service listings, including approving or suspending users and services.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as admin user"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to user management section"
+      },
+      {
+        "type": "action",
+        "description": "Search users by email, name, or role"
+      },
+      {
+        "type": "assertion",
+        "description": "User list is correctly filtered and displayed"
+      },
+      {
+        "type": "action",
+        "description": "Select a user and perform moderation actions (suspend, reactivate)"
+      },
+      {
+        "type": "assertion",
+        "description": "User status updates correctly and moderation actions are logged"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to service management section"
+      },
+      {
+        "type": "action",
+        "description": "Approve, edit, or remove service listings"
+      },
+      {
+        "type": "assertion",
+        "description": "Service status reflects moderation changes and listings update accordingly"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Role-Based Access Control and Route Protection",
+    "description": "Verify that navigation routes and pages are accessible only to appropriate roles and that unauthorized access redirects with proper messages.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as client user"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to navigate to admin panel URL directly"
+      },
+      {
+        "type": "assertion",
+        "description": "Access is denied and user is redirected to unauthorized or login page"
+      },
+      {
+        "type": "action",
+        "description": "Login as student freelancer"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to job posting creation page"
+      },
+      {
+        "type": "assertion",
+        "description": "Access is denied since only clients can post jobs"
+      },
+      {
+        "type": "action",
+        "description": "Logout and attempt to access any protected page"
+      },
+      {
+        "type": "assertion",
+        "description": "User is redirected to login page for authentication"
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "API Endpoint Validation and Error Handling",
+    "description": "Verify that API endpoints respond with meaningful error messages for invalid inputs and unauthorized requests and handle edge cases gracefully.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send API request to create service with missing required fields"
+      },
+      {
+        "type": "assertion",
+        "description": "API returns 400 status with validation error details"
+      },
+      {
+        "type": "action",
+        "description": "Send API request to access order details without valid JWT token"
+      },
+      {
+        "type": "assertion",
+        "description": "API returns 401 Unauthorized status with error message"
+      },
+      {
+        "type": "action",
+        "description": "Send malformed JWT token in API request header"
+      },
+      {
+        "type": "assertion",
+        "description": "API returns 401 Unauthorized due to invalid token"
+      },
+      {
+        "type": "action",
+        "description": "Access resource with valid JWT token but insufficient role permission"
+      },
+      {
+        "type": "assertion",
+        "description": "API returns 403 Forbidden response"
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Responsive UI/UX on Desktop and Mobile",
+    "description": "Verify that all pages including landing page, dashboards, and core features render correctly on multiple devices and maintain corporate styling standards.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open platform landing page on desktop browser"
+      },
+      {
+        "type": "assertion",
+        "description": "Page shows features and value propositions with corporate styling and no visual defects"
+      },
+      {
+        "type": "action",
+        "description": "Repeat on mobile devices with various screen sizes"
+      },
+      {
+        "type": "assertion",
+        "description": "Layout adjusts responsively, navigation is usable, and content is legible"
+      },
+      {
+        "type": "action",
+        "description": "Navigate through dashboard, order pages, messaging on mobile"
+      },
+      {
+        "type": "assertion",
+        "description": "All UI elements are functional without broken layout or overlaps"
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Security: Password Hashing and JWT Token Storage",
+    "description": "Verify passwords are hashed with Bcryptjs before storage and JWT tokens expire correctly with secure storage on the client side.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Register new user with password"
+      },
+      {
+        "type": "assertion",
+        "description": "Password stored in database is hashed and not plaintext"
+      },
+      {
+        "type": "action",
+        "description": "Login and receive JWT token"
+      },
+      {
+        "type": "assertion",
+        "description": "Token contains expiry date and is stored securely (e.g., httpOnly cookie or secure storage)"
+      },
+      {
+        "type": "action",
+        "description": "Wait for token expiry and attempt to use expired token for API"
+      },
+      {
+        "type": "assertion",
+        "description": "Request is rejected with unauthorized error"
+      }
+    ]
+  }
+]

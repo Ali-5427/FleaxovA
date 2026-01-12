@@ -1,0 +1,15 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:5173",
+  "executionArgs": {
+    "projectName": "FleaxovA",
+    "projectPath": "c:\\Users\\Admin\\Downloads\\FleaxovA",
+    "testIds": [],
+    "additionalInstruction": "",
+    "envs": {
+      "API_KEY": "sk-user-GFhv85bvxzpTz_G4XjA0S2OjZGbPGVyUqsCSamfOkThA4N_3sYyvq7Jjym5TpZ_Q3YsNHGtZRoLLtLyyugvEQZeMxs7EDaQ2J2Bs9obwlZpE_ETBpXyxGhGXhcH-pggF8mA"
+    }
+  }
+}

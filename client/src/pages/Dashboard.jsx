@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import { formatDate } from '../utils/helpers';
 
 const Dashboard = () => {
     const { user } = useAuth();
@@ -22,7 +23,7 @@ const Dashboard = () => {
                     setJobs(jobsRes.data.data.filter(j => j.client?._id === user.id));
                 }
 
-                if (user?.role === 'student') {
+                if (user?.role === 'freelancer' || user?.role === 'student') {
                     const appsRes = await api.get('/api/applications');
                     setApplications(appsRes.data.data);
                 }
@@ -36,6 +37,28 @@ const Dashboard = () => {
         fetchDashboardData();
     }, [user]);
 
+    const handleAcceptOrder = async (orderId) => {
+        try {
+            await api.put(`/api/orders/${orderId}/status`, { status: 'accepted' });
+            setOrders(orders.map(order => order._id === orderId ? { ...order, status: 'accepted' } : order));
+            alert('Order accepted successfully!');
+        } catch (error) {
+            console.error('Error accepting order', error);
+            alert('Failed to accept order.');
+        }
+    };
+
+    const handleRequestRevision = async (orderId) => {
+        try {
+            await api.put(`/api/orders/${orderId}/status`, { status: 'revision_requested' });
+            setOrders(orders.map(order => order._id === orderId ? { ...order, status: 'revision_requested' } : order));
+            alert('Revision requested successfully!');
+        } catch (error) {
+            console.error('Error requesting revision', error);
+            alert('Failed to request revision.');
+        }
+    };
+
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
             <div className="md:flex md:items-center md:justify-between mb-8">
@@ -48,7 +71,7 @@ const Dashboard = () => {
                     </p>
                 </div>
                 <div className="mt-4 flex md:mt-0 md:ml-4 gap-3">
-                    {user?.role === 'student' && (
+                    {(user?.role === 'freelancer' || user?.role === 'student') && (
                         <Link
                             to="/create-service"
                             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800"
@@ -79,7 +102,7 @@ const Dashboard = () => {
                         <dd className="mt-1 text-3xl font-semibold text-gray-900">{jobs.length}</dd>
                     </div>
                 )}
-                {user?.role === 'student' && (
+                {(user?.role === 'freelancer' || user?.role === 'student') && (
                     <div className="bg-white overflow-hidden shadow rounded-lg border border-gray-200 p-5">
                         <dt className="text-sm font-medium text-gray-500 truncate">Applications</dt>
                         <dd className="mt-1 text-3xl font-semibold text-gray-900">{applications.length}</dd>
@@ -91,7 +114,7 @@ const Dashboard = () => {
                             <dt className="text-sm font-medium text-gray-500 truncate">Wallet Balance</dt>
                             <dd className="mt-1 text-3xl font-semibold text-gray-900">₹{user?.wallet?.balance || 0}</dd>
                         </div>
-                        {user?.role === 'student' && (
+                        {user?.role === 'freelancer' && (
                             <Link to="/wallet" className="text-xs font-black text-gray-400 hover:text-black uppercase tracking-widest border-b border-transparent hover:border-black transition-all">
                                 Manage Funds
                             </Link>
@@ -113,7 +136,7 @@ const Dashboard = () => {
                                             Service
                                         </th>
                                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {user?.role === 'student' ? 'Client' : 'Freelancer'}
+                                            {(user?.role === 'freelancer' || user?.role === 'student') ? 'Client' : 'Freelancer'}
                                         </th>
                                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Amount
@@ -134,7 +157,7 @@ const Dashboard = () => {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm text-gray-500">
-                                                    {user?.role === 'student' ? order.client?.name : order.freelancer?.name}
+                                                    {(user?.role === 'freelancer' || user?.role === 'student') ? order.client?.name : order.freelancer?.name}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -149,7 +172,23 @@ const Dashboard = () => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a href="#" className="text-indigo-600 hover:text-indigo-900">View</a>
+                                                <a href="#" className="text-indigo-600 hover:text-indigo-900 mr-4">View</a>
+                                                {user?.role === 'client' && order.status === 'completed' && (
+                                                    <div className="inline-flex space-x-2">
+                                                        <button
+                                                            onClick={() => handleAcceptOrder(order._id)}
+                                                            className="text-green-600 hover:text-green-900"
+                                                        >
+                                                            Accept
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleRequestRevision(order._id)}
+                                                            className="text-red-600 hover:text-red-900"
+                                                        >
+                                                            Request Revision
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
@@ -204,7 +243,7 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {user?.role === 'student' && (
+            {(user?.role === 'freelancer' || user?.role === 'student') && (
                 <div className="mt-10">
                     <h3 className="text-xl font-bold text-gray-900 mb-6">Your Applications</h3>
                     <div className="bg-white shadow overflow-hidden sm:rounded-xl border border-gray-200">

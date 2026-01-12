@@ -114,7 +114,7 @@ const ServiceDetail = () => {
                 <div className="flex flex-col">
                     <div className="w-full aspect-w-4 aspect-h-3 bg-gray-200 rounded-2xl overflow-hidden shadow-xl border border-gray-100">
                         <img
-                            src={getCategoryImage(service.category)}
+                            src={service.images && service.images.length > 0 ? service.images[0] : getCategoryImage(service.category)}
                             alt={service.title}
                             className="w-full h-[400px] object-cover"
                         />
@@ -139,7 +139,7 @@ const ServiceDetail = () => {
                     <div className="mt-6">
                         <div className="flex items-center text-sm text-gray-500">
                             <Clock className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
-                            <span>Delivery in {service.deliveryTime} days</span>
+                            <span>Delivery in {service.deliveryTime || service.delivery_time} days</span>
                         </div>
                         <div className="flex items-center text-sm text-gray-500 mt-2">
                             <Shield className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />

@@ -6,9 +6,18 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem('token'));
+
+    // Synchronize localStorage when user state changes
+    useEffect(() => {
+        if (user) {
+            localStorage.setItem('user', JSON.stringify(user));
+        } else {
+            localStorage.removeItem('user');
+        }
+    }, [user]);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -20,8 +29,10 @@ export const AuthProvider = ({ children }) => {
                 const res = await api.get('/api/auth/me');
                 setUser(res.data.data);
             } catch (error) {
-                console.error('Error loading user', error);
-                logout();
+                console.warn('Silent auth check failed');
+                if (error.response?.status === 401) {
+                    logout();
+                }
             } finally {
                 setLoading(false);
             }
@@ -34,6 +45,7 @@ export const AuthProvider = ({ children }) => {
         const res = await api.post('/api/auth/login', { email, password });
         localStorage.setItem('token', res.data.token);
         setToken(res.data.token);
+        setUser(res.data.user); // Set immediately
         return res.data;
     };
 
@@ -42,6 +54,7 @@ export const AuthProvider = ({ children }) => {
         if (res.data.token) {
             localStorage.setItem('token', res.data.token);
             setToken(res.data.token);
+            setUser(res.data.user); // Set immediately
         }
         return res.data;
     };
@@ -50,6 +63,7 @@ export const AuthProvider = ({ children }) => {
         const res = await api.post('/api/auth/verify-email', { email, otp });
         localStorage.setItem('token', res.data.token);
         setToken(res.data.token);
+        setUser(res.data.user); // Set immediately
         return res.data;
     };
 

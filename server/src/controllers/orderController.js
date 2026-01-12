@@ -52,7 +52,7 @@ exports.getOrders = async (req, res, next) => {
     try {
         const { data: orders, error } = await supabase
             .from('orders')
-            .select('*, service:services(title), client:users(name, email), freelancer:users(name, email)')
+            .select('*, service:services(title), client:users(email), freelancer:users(email)')
             .or(`client_id.eq.${req.user.id},freelancer_id.eq.${req.user.id}`);
 
         if (error) throw error;

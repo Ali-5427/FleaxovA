@@ -3,6 +3,17 @@ import api from '../api/axios';
 import { Link } from 'react-router-dom';
 import { Briefcase, MapPin, Clock, IndianRupee, Search, Filter } from 'lucide-react';
 
+const getCategoryImage = (category) => {
+    const images = {
+        'Development': 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80',
+        'Design': 'https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=800&q=80',
+        'Writing': 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80',
+        'Marketing': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
+        'AI Services': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80',
+    };
+    return images[category] || 'https://images.unsplash.com/photo-1454165833762-02c50e899e53?auto=format&fit=crop&w=800&q=80';
+};
+
 const Jobs = () => {
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -85,6 +96,7 @@ const Jobs = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {[1, 2, 3, 4].map(i => (
                         <div key={i} className="bg-white border border-gray-100 rounded-2xl p-6 animate-pulse shadow-sm">
+                            <div className="h-48 bg-gray-200 rounded-xl mb-4"></div>
                             <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
                             <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
                             <div className="h-4 bg-gray-200 rounded w-5/6 mb-6"></div>
@@ -98,45 +110,55 @@ const Jobs = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {jobs.map((job) => (
-                        <div key={job._id} className="group bg-white border border-gray-200 rounded-2xl p-8 hover:border-black hover:shadow-2xl transition-all duration-300 flex flex-col relative overflow-hidden">
-                            <div className="absolute top-0 right-0 h-1 w-0 bg-black group-hover:w-full transition-all duration-500"></div>
-
-                            <div className="flex justify-between items-start mb-6">
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black text-white">
-                                    {job.category}
-                                </span>
-                                <span className="flex items-center text-xs text-gray-400 font-medium whitespace-nowrap">
-                                    <Clock className="h-3 w-3 mr-1" />
-                                    {new Date(job.createdAt).toLocaleDateString()}
-                                </span>
+                        <div key={job._id} className="group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-black hover:shadow-2xl transition-all duration-300 flex flex-col relative">
+                            <div className="h-48 overflow-hidden relative">
+                                <img
+                                    src={job.images && job.images.length > 0 ? job.images[0] : getCategoryImage(job.category)}
+                                    alt={job.title}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                                <div className="absolute top-4 left-4">
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black text-white shadow-lg">
+                                        {job.category}
+                                    </span>
+                                </div>
                             </div>
 
-                            <h3 className="text-2xl font-bold text-gray-900 group-hover:text-black transition-colors mb-3">
-                                {job.title}
-                            </h3>
-
-                            <p className="text-gray-600 line-clamp-3 mb-8 flex-grow leading-relaxed">
-                                {job.description}
-                            </p>
-
-                            <div className="pt-6 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4 mt-auto">
-                                <div className="flex items-center gap-6">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Budget</span>
-                                        <span className="text-lg font-black text-gray-900">₹{job.budget?.toLocaleString()}</span>
-                                    </div>
-                                    <div className="flex flex-col border-l border-gray-100 pl-6">
-                                        <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Duration</span>
-                                        <span className="text-sm font-bold text-gray-700">{job.deadline} Days</span>
-                                    </div>
+                            <div className="p-8 flex-grow flex flex-col">
+                                <div className="flex justify-between items-start mb-4">
+                                    <span className="flex items-center text-xs text-gray-400 font-medium whitespace-nowrap">
+                                        <Clock className="h-3 w-3 mr-1" />
+                                        {new Date(job.createdAt).toLocaleDateString()}
+                                    </span>
                                 </div>
 
-                                <Link
-                                    to={`/jobs/${job._id}`}
-                                    className="px-6 py-3 bg-gray-50 text-black text-sm font-bold rounded-xl hover:bg-black hover:text-white transition-all transform active:scale-95 group-hover:shadow-lg"
-                                >
-                                    View Details
-                                </Link>
+                                <h3 className="text-2xl font-bold text-gray-900 group-hover:text-black transition-colors mb-3">
+                                    {job.title}
+                                </h3>
+
+                                <p className="text-gray-600 line-clamp-2 mb-8 flex-grow leading-relaxed">
+                                    {job.description}
+                                </p>
+
+                                <div className="pt-6 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4 mt-auto">
+                                    <div className="flex items-center gap-6">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Budget</span>
+                                            <span className="text-lg font-black text-gray-900">₹{job.budget?.toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex flex-col border-l border-gray-100 pl-6">
+                                            <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Duration</span>
+                                            <span className="text-sm font-bold text-gray-700">{job.deadline} Days</span>
+                                        </div>
+                                    </div>
+
+                                    <Link
+                                        to={`/jobs/${job._id}`}
+                                        className="px-6 py-3 bg-gray-50 text-black text-sm font-bold rounded-xl hover:bg-black hover:text-white transition-all transform active:scale-95 group-hover:shadow-lg"
+                                    >
+                                        View Details
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     ))}

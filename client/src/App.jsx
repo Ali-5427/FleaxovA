@@ -38,7 +38,7 @@ function App() {
                         <Route
                             path="/create-service"
                             element={
-                                <ProtectedRoute allowedRoles={['student', 'admin']}>
+                                <ProtectedRoute allowedRoles={['student', 'freelancer', 'admin']}>
                                     <CreateService />
                                 </ProtectedRoute>
                             }
@@ -62,7 +62,7 @@ function App() {
                         <Route
                             path="/edit-profile"
                             element={
-                                <ProtectedRoute allowedRoles={['student']}>
+                                <ProtectedRoute allowedRoles={['student', 'freelancer']}>
                                     <EditProfile />
                                 </ProtectedRoute>
                             }
@@ -106,7 +106,6 @@ function App() {
                                 </ProtectedRoute>
                             }
                         />
-                        {/* Add more routes later */}
                     </Routes>
                 </div>
             </AuthProvider>

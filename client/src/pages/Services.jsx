@@ -54,6 +54,7 @@ const Services = () => {
                 if (keyword) params.append('keyword', keyword);
 
                 const res = await api.get(`${url}?${params.toString()}`);
+                console.log('Services API Response:', res.data);
                 setServices(res.data.data);
             } catch (error) {
                 console.error('Error fetching services', error);
@@ -112,9 +113,9 @@ const Services = () => {
                 ) : (
                     services.map((service) => (
                         <div key={service._id} className="group relative bg-white border border-gray-200 rounded-lg flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                            <div className="aspect-w-16 aspect-h-9 bg-gray-200 group-hover:opacity-90 transition-opacity">
+                            <div className="aspect-w-16 aspect-h-9 bg-gray-200 group-hover:opacity-90 transition-opacity relative">
                                 <img
-                                    src={getCategoryImage(service.category)}
+                                    src={service.images && service.images.length > 0 ? service.images[0] : getCategoryImage(service.category)}
                                     alt={service.title}
                                     className="w-full h-48 object-cover"
                                 />

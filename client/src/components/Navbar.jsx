@@ -81,17 +81,17 @@ const Navbar = () => {
                                     Messages
                                 </NavLink>
                             )}
-                            {isAuthenticated && user?.role === 'student' && (
+                            {(isAuthenticated && (user?.role === 'freelancer' || user?.role === 'student')) && (
                                 <NavLink to="/wallet" className={navLinkClass}>
                                     Wallet
                                 </NavLink>
                             )}
-                            {isAuthenticated && user?.role === 'student' && (
+                            {(isAuthenticated && (user?.role === 'freelancer' || user?.role === 'student')) && (
                                 <NavLink to="/dashboard" className={navLinkClass}>
                                     My Services
                                 </NavLink>
                             )}
-                            {isAuthenticated && user?.role === 'student' && (
+                            {(isAuthenticated && (user?.role === 'freelancer' || user?.role === 'student')) && (
                                 <NavLink to="/edit-profile" className={navLinkClass}>
                                     My Profile
                                 </NavLink>
@@ -241,7 +241,7 @@ const Navbar = () => {
                                 Messages
                             </NavLink>
                         )}
-                        {isAuthenticated && user?.role === 'student' && (
+                        {(isAuthenticated && (user?.role === 'freelancer' || user?.role === 'student')) && (
                             <NavLink
                                 to="/wallet"
                                 className={({ isActive }) =>
@@ -254,7 +254,7 @@ const Navbar = () => {
                                 Wallet
                             </NavLink>
                         )}
-                        {isAuthenticated && user?.role === 'student' && (
+                        {(isAuthenticated && (user?.role === 'freelancer' || user?.role === 'student')) && (
                             <NavLink
                                 to="/dashboard"
                                 className={({ isActive }) =>
@@ -267,7 +267,7 @@ const Navbar = () => {
                                 My Services
                             </NavLink>
                         )}
-                        {isAuthenticated && user?.role === 'student' && (
+                        {(isAuthenticated && (user?.role === 'freelancer' || user?.role === 'student')) && (
                             <NavLink
                                 to="/edit-profile"
                                 className={({ isActive }) =>

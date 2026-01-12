@@ -7,7 +7,7 @@ exports.getNotifications = async (req, res, next) => {
     try {
         const { data: notifications, error } = await supabase
             .from('notifications')
-            .select('*, sender:users(name)')
+            .select('*, sender:users!sender_id(email)') // Disambiguate FK
             .eq('user_id', req.user.id)
             .order('created_at', { ascending: false });
 

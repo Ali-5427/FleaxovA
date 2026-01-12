@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const EditProfile = () => {
     const { user } = useAuth();
@@ -39,7 +41,7 @@ const EditProfile = () => {
         }
 
         const fetchProfile = async () => {
-            if (user?.role !== 'student') return;
+            if (user?.role !== 'student' && user?.role !== 'freelancer') return;
             try {
                 const res = await api.get('/api/profiles/me');
                 if (res.data.data) {
@@ -64,7 +66,7 @@ const EditProfile = () => {
             }
         };
         fetchProfile();
-        if (user?.role !== 'student') setLoading(false);
+        if (user?.role !== 'student' && user?.role !== 'freelancer') setLoading(false);
     }, [user]);
 
     const handleSubmit = async (e) => {
@@ -79,7 +81,7 @@ const EditProfile = () => {
             });
 
             // Update Student Profile if applicable
-            if (user?.role === 'student') {
+            if (user?.role === 'student' || user?.role === 'freelancer') {
                 const portfolioArray = formData.portfolio.split(',')
                     .filter(url => url.trim() !== '')
                     .map(url => ({ url: url.trim(), title: 'Project Link' }));
@@ -98,7 +100,8 @@ const EditProfile = () => {
             alert('Profile Updated Successfully!');
             window.location.reload();
         } catch (err) {
-            alert('Error updating profile');
+            const errorMsg = err.response?.data?.message || err.message || 'Error updating profile';
+            alert(`Error: ${errorMsg}`);
             console.error(err);
         }
     };
@@ -107,7 +110,7 @@ const EditProfile = () => {
 
     return (
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Edit Your {user?.role === 'student' ? 'Student Profile' : 'Business Profile'}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">Edit Your {(user?.role === 'student' || user?.role === 'freelancer') ? 'Student Profile' : 'Business Profile'}</h1>
 
             <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow border border-gray-200">
 
@@ -162,7 +165,7 @@ const EditProfile = () => {
                     </div>
                 )}
 
-                {user?.role === 'student' && (
+                {(user?.role === 'student' || user?.role === 'freelancer') && (
                     <div className="space-y-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Professional Title</label>
@@ -181,13 +184,12 @@ const EditProfile = () => {
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Bio / About Me</label>
                             <div className="mt-1">
-                                <textarea
-                                    rows={4}
-                                    required
-                                    className="shadow-sm focus:ring-black focus:border-black block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
-                                    placeholder="Tell clients about your education and expertise..."
+                                <ReactQuill
+                                    theme="snow"
                                     value={formData.bio}
-                                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                                    onChange={(value) => setFormData({ ...formData, bio: value })}
+                                    placeholder="Tell clients about your education and expertise..."
+                                    className="bg-white"
                                 />
                             </div>
                         </div>

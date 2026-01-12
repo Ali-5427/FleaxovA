@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const { getUserClient } = require('../config/supabase');
 const { createNotification } = require('./notificationController');
 
 // @desc    Apply to a job
@@ -21,7 +22,8 @@ exports.applyToJob = async (req, res, next) => {
         if (jobError || !job) return res.status(404).json({ success: false, message: 'Job not found' });
         if (job.status !== 'open') return res.status(400).json({ success: false, message: 'Job closed' });
 
-        const { data: application, error: appError } = await supabase
+        const userClient = getUserClient(req);
+        const { data: application, error: appError } = await userClient
             .from('applications')
             .insert({
                 job_id: jobId,
@@ -55,7 +57,7 @@ exports.applyToJob = async (req, res, next) => {
 // @route   GET /api/applications
 exports.getApplications = async (req, res, next) => {
     try {
-        let query = supabase.from('applications').select('*, job:jobs(title, status), freelancer:users(name, email)');
+        let query = supabase.from('applications').select('*, job:jobs(title, status), freelancer:users(email)');
 
         if (req.user.role === 'student') {
             query = query.eq('freelancer_id', req.user.id);
@@ -86,7 +88,7 @@ exports.getJobApplications = async (req, res, next) => {
 
         const { data: applications, error } = await supabase
             .from('applications')
-            .select('*, freelancer:users(name, email)')
+            .select('*, freelancer:users(email)')
             .eq('job_id', req.params.jobId);
 
         if (error) throw error;
@@ -112,7 +114,8 @@ exports.updateApplicationStatus = async (req, res, next) => {
         }
 
         const { status } = req.body;
-        const { data: updatedApp, error } = await supabase
+        const userClient = getUserClient(req);
+        const { data: updatedApp, error } = await userClient
             .from('applications')
             .update({ status })
             .eq('id', req.params.id)
@@ -130,7 +133,8 @@ exports.updateApplicationStatus = async (req, res, next) => {
         );
 
         if (status === 'accepted') {
-            await supabase
+            const userClient = getUserClient(req);
+            await userClient
                 .from('jobs')
                 .update({ status: 'assigned', assigned_freelancer_id: application.freelancer_id })
                 .eq('id', application.job_id);

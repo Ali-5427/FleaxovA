@@ -1,0 +1,137 @@
+{
+    "tech_stack": [
+        "JavaScript",
+        "React.js (Vite)",
+        "Node.js",
+        "Express.js",
+        "Supabase (PostgreSQL)",
+        "TailwindCSS",
+        "React Router",
+        "JWT Authentication",
+        "Lucide Icons",
+        "React Quill",
+        "Axios"
+    ],
+    "features": [
+        {
+            "name": "Authentication System",
+            "description": "JWT-based authentication with login, registration, password reset, and role-based access control for students, clients, and admins",
+            "files": [
+                "client/src/pages/Login.jsx",
+                "client/src/pages/Register.jsx",
+                "client/src/pages/ForgotPassword.jsx",
+                "client/src/pages/ResetPassword.jsx",
+                "client/src/context/AuthContext.jsx",
+                "server/src/controllers/authController.js",
+                "server/src/routes/authRoutes.js",
+                "server/src/middleware/auth.js"
+            ]
+        },
+        {
+            "name": "Service Marketplace",
+            "description": "Browse and manage freelance services offered by students, with service listings, details, creation, and search functionality",
+            "files": [
+                "client/src/pages/Services.jsx",
+                "client/src/pages/ServiceDetail.jsx",
+                "client/src/pages/CreateService.jsx",
+                "server/src/controllers/serviceController.js",
+                "server/src/routes/serviceRoutes.js"
+            ]
+        },
+        {
+            "name": "Job Management",
+            "description": "Job posting and application system for clients to post job requirements and track applications",
+            "files": [
+                "client/src/pages/Jobs.jsx",
+                "client/src/pages/JobDetail.jsx",
+                "client/src/pages/CreateJob.jsx",
+                "client/src/pages/JobAdmin.jsx",
+                "server/src/controllers/jobController.js",
+                "server/src/routes/jobRoutes.js",
+                "server/src/controllers/applicationController.js",
+                "server/src/routes/applicationRoutes.js"
+            ]
+        },
+        {
+            "name": "User Dashboard",
+            "description": "Role-based dashboards for students and clients to manage their orders, services, and activities",
+            "files": [
+                "client/src/pages/Dashboard.jsx",
+                "client/src/pages/AdminDashboard.jsx"
+            ]
+        },
+        {
+            "name": "Profile Management",
+            "description": "User profile creation and editing with bio, skills, portfolio, and other professional information",
+            "files": [
+                "client/src/pages/EditProfile.jsx",
+                "server/src/controllers/profileController.js",
+                "server/src/routes/profileRoutes.js"
+            ]
+        },
+        {
+            "name": "Order Management",
+            "description": "Complete order lifecycle management from creation to delivery and completion",
+            "files": [
+                "server/src/controllers/orderController.js",
+                "server/src/routes/orderRoutes.js"
+            ]
+        },
+        {
+            "name": "Wallet & Payment System",
+            "description": "Escrow payment system where payments are collected upfront and released upon successful delivery",
+            "files": [
+                "client/src/pages/Wallet.jsx",
+                "client/src/pages/Payment.jsx",
+                "server/src/controllers/walletController.js",
+                "server/src/routes/walletRoutes.js"
+            ]
+        },
+        {
+            "name": "Messaging System",
+            "description": "Real-time messaging between clients and students for communication about services and orders",
+            "files": [
+                "client/src/pages/Messages.jsx",
+                "server/src/controllers/messageController.js",
+                "server/src/routes/messageRoutes.js"
+            ]
+        },
+        {
+            "name": "Reviews & Ratings",
+            "description": "Rating and review system for services to build trust and reputation",
+            "files": [
+                "server/src/controllers/reviewController.js",
+                "server/src/routes/reviewRoutes.js"
+            ]
+        },
+        {
+            "name": "Notifications",
+            "description": "User notification system for order updates, messages, and important events",
+            "files": [
+                "server/src/controllers/notificationController.js",
+                "server/src/routes/notificationRoutes.js"
+            ]
+        },
+        {
+            "name": "Home Page",
+            "description": "Landing page showcasing the platform features and service categories",
+            "files": [
+                "client/src/pages/Home.jsx"
+            ]
+        },
+        {
+            "name": "API Integration",
+            "description": "Centralized API service for handling HTTP requests to the backend",
+            "files": [
+                "client/src/api/api.js"
+            ]
+        },
+        {
+            "name": "Supabase Database Configuration",
+            "description": "Database connection and client configuration using Supabase PostgreSQL",
+            "files": [
+                "server/src/config/supabase.js"
+            ]
+        }
+    ]
+}
