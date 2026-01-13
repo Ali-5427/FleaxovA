@@ -6,44 +6,23 @@ const { getUserClient } = require('../config/supabase');
 // @access  Public
 exports.getJobs = async (req, res, next) => {
     try {
-        const mappedJobs = [
-            {
-                _id: 'job-demo-1',
-                id: 'job-demo-1',
-                title: 'React Developer for Fintech App',
-                description: 'Looking for a skilled student to help build out our payment dashboard for a new Fintech startup. Must be proficient in state management and API integration.',
-                category: 'Development',
-                budget: 15000,
-                deadline: '14',
-                images: ['/images/samples/service-dashboard.png'],
-                createdAt: new Date().toISOString(),
-                client: { name: 'Sarah Chen' }
-            },
-            {
-                _id: 'job-demo-2',
-                id: 'job-demo-2',
-                title: 'Mobile App UI/UX Design',
-                description: 'Need a stunning design for a new fitness app. High-fidelity wireframes and prototype required in Figma.',
-                category: 'Design',
-                budget: 10000,
-                deadline: '7',
-                images: ['/images/samples/service-logo.png'],
-                createdAt: new Date().toISOString(),
-                client: { name: 'Alex Tech' }
-            },
-            {
-                _id: 'job-demo-3',
-                id: 'job-demo-3',
-                title: 'Technical Documentation for AI API',
-                description: 'Write professional-grade documentation for a new AI-native API. Must include clear examples and clean markdown structure.',
-                category: 'AI Services',
-                budget: 8500,
-                deadline: '5',
-                images: ['/images/samples/service-ai.png'],
-                createdAt: new Date().toISOString(),
-                client: { name: 'Sarah Chen' }
-            }
-        ];
+        // Fetch jobs from Supabase, joining with the client's name
+        const { data: jobs, error } = await supabase
+            .from('jobs')
+            .select(`
+                *,
+                client:users ( name, email )
+            `);
+
+        if (error) throw error;
+
+        // Add a fallback for the '_id' field and format the response
+        const mappedJobs = jobs.map(j => ({
+            ...j,
+            _id: j.id,
+            // Ensure client is an object with a name, even if the join fails
+            client: j.client ? j.client : { name: 'Unknown' }
+        }));
 
         res.status(200).json({ success: true, count: mappedJobs.length, data: mappedJobs });
     } catch (err) {
@@ -84,7 +63,7 @@ exports.getJob = async (req, res, next) => {
                         category: 'Design',
                         budget: 10000,
                         deadline: '7 Days',
-                        images: ['/images/samples/service-logo.png'],
+                        images: ['/images/samples/service-mobile.png'],
                         createdAt: new Date().toISOString(),
                         client: { name: 'Alex Tech', email: 'alex@demo.com' }
                     },
@@ -94,7 +73,7 @@ exports.getJob = async (req, res, next) => {
                         description: 'Write professional-grade documentation for a new AI-native API. Must include clear examples and clean markdown structure.',
                         category: 'AI Services',
                         budget: 8500,
-                        deadline: '5',
+                        deadline: '5 Days',
                         images: ['/images/samples/service-ai.png'],
                         createdAt: new Date().toISOString(),
                         client: { name: 'Sarah Chen', email: 'sarah@demo.com' }
